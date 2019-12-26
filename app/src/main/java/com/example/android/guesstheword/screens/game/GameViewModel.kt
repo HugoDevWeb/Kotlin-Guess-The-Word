@@ -113,4 +113,8 @@ class GameViewModel : ViewModel() {
     private fun onGameFinish(){
         _eventGameFinish.value = true
     }
+
+    fun onGameFinishComplete(){
+        _eventGameFinish.value = false
+    }
 }
