@@ -54,6 +54,8 @@ class GameFragment : Fragment() {
         // Get the viewModel
         viewModel = ViewModelProviders.of(this).get(GameViewModel::class.java)
 
+        binding.gameViewModel = viewModel
+
         viewModel.score.observe(this, Observer { newScore ->
             binding.scoreText.text = newScore.toString()
         })
@@ -78,6 +80,7 @@ class GameFragment : Fragment() {
     private fun onSkip() {
         viewModel.onSkip()
     }
+
     private fun onCorrect() {
         viewModel.onCorrect()
     }
@@ -94,7 +97,7 @@ class GameFragment : Fragment() {
     private fun gameFinished() {
         Toast.makeText(activity, "Game has just finished", Toast.LENGTH_SHORT).show()
         val action = GameFragmentDirections.actionGameToScore()
-        action.score = viewModel.score.value?:0
+        action.score = viewModel.score.value ?: 0
         findNavController(this).navigate(action)
         viewModel.onGameFinishComplete()
     }
