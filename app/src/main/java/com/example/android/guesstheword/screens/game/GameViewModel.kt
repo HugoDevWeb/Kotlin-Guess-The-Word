@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment
@@ -17,10 +19,19 @@ import com.example.android.guesstheword.databinding.GameFragmentBinding
 class GameViewModel : ViewModel() {
 
     // The current word
-    var word = ""
+    private val _word = MutableLiveData<String>()
+    val word: LiveData<String>
+        get() = _word
 
     // The current score
-    var score = 0
+    private val _score = MutableLiveData<Int>()
+    val score: LiveData<Int>
+        get() = _score
+
+
+    private val _eventGameFinish = MutableLiveData<Boolean>()
+    val eventGameFinish: LiveData<Boolean>
+        get() = _eventGameFinish
 
     // The list of words - the front of the list is the next word to guess
     private lateinit var wordList: MutableList<String>
@@ -57,6 +68,9 @@ class GameViewModel : ViewModel() {
     }
 
     init {
+
+        _word.value = ""
+        _score.value = 0
         Log.i("GameViewModel", "GameViewModel created!")
         resetList()
         nextWord()
@@ -73,13 +87,13 @@ class GameViewModel : ViewModel() {
     /** Methods for updating the UI **/
     fun onSkip() {
         if (!wordList.isEmpty()) {
-            score--
+            _score.value = (score.value)?.minus(1)
         }
         nextWord()
     }
     fun onCorrect() {
         if (!wordList.isEmpty()) {
-            score++
+            _score.value = (score.value)?.plus(1)
         }
         nextWord()
     }
@@ -89,8 +103,14 @@ class GameViewModel : ViewModel() {
      */
     private fun nextWord() {
         //Select and remove a word from the list
-        if (!wordList.isEmpty()) {
-            word = wordList.removeAt(0)
+        if (wordList.isEmpty()) {
+            onGameFinish()
+        } else {
+            _word.value = wordList.removeAt(0)
         }
+    }
+
+    private fun onGameFinish(){
+        _eventGameFinish.value = true
     }
 }
